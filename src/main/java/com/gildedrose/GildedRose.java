@@ -1,5 +1,12 @@
 package com.gildedrose;
 
+/**
+ * Some constraints:
+ *
+ * <ul>
+ *   <li>Item class and items property can not be altered
+ * </ul>
+ */
 class GildedRose {
   Item[] items;
 
