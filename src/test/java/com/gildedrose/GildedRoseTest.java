@@ -22,7 +22,7 @@ class GildedRoseTest {
     Item[] items = new Item[] {new Item("foo", 2, 50)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
-    assertEquals(app.items[0].quality, 99);
+    assertEquals(app.items[0].quality, 49);
   }
 
   @Test
@@ -30,7 +30,25 @@ class GildedRoseTest {
     Item[] items = new Item[] {new Item("foo", 0, 0)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
-    assertEquals("foo", app.items[0].name);
+    assertEquals(app.items[0].quality, 0);
+  }
+
+  // Part of requirements, but not enforced
+  @Test
+  void givenItemWithNegativeQuality_WhenUpdateQuality_ThenQualityIsZero() {
+    Item[] items = new Item[] {new Item("foo", 0, -1)};
+    GildedRose app = new GildedRose(items);
+    app.updateQuality();
+    assertEquals(app.items[0].quality, 0);
+  }
+
+  // Part of requirements, but not enforced
+  @Test
+  void givenItemWith100Quality_WhenUpdateQuality_ThenQualityIs50() {
+    Item[] items = new Item[] {new Item("foo", 0, 100)};
+    GildedRose app = new GildedRose(items);
+    app.updateQuality();
+    assertEquals(app.items[0].quality, 50);
   }
 
   @Test
@@ -38,7 +56,7 @@ class GildedRoseTest {
     Item[] items = new Item[] {new Item("foo", 0, 50)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
-    assertEquals(app.items[0].quality, 98);
+    assertEquals(app.items[0].quality, 48);
   }
 
   @Test
@@ -94,6 +112,7 @@ class GildedRoseTest {
     Item[] items = new Item[] {new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, 10)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
+    assertEquals(app.items[0].sellIn, sellIn - 1);
     assertEquals(app.items[0].quality, expectedQuality);
   }
 }
