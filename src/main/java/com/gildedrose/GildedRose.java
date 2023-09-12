@@ -29,50 +29,7 @@ class GildedRose {
    */
   public void updateQuality() {
     for (Item item : items) {
-      String name = item.name;
-      int qualityDelta = -1;
-      int deltaFactor = 1;
-      if (name.startsWith("Conjured")) {
-        deltaFactor *= 2;
-        name = item.name.substring("Conjured ".length());
-      }
-      if (name.equals("Sulfuras, Hand of Ragnaros")) continue;
-      item.sellIn -= 1;
-      if (item.sellIn < 0) {
-        deltaFactor *= 2;
-      }
-      if (name.equals("Aged Brie")) {
-        qualityDelta = 1;
-      }
-      if (name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-        qualityDelta = setBackstagePassesQualityDelta(item);
-      }
-      correctInvalidQuality(item);
-      item.quality = Math.max(0, Math.min(item.quality + qualityDelta * deltaFactor, 50));
+      ItemRuleFactory.createItemRule(item.name).apply(item);
     }
-  }
-
-  private static void correctInvalidQuality(Item item) {
-    if (item.quality < 0) {
-      item.quality = 0;
-    }
-    if (item.quality > 50) {
-      item.quality = 50;
-    }
-  }
-
-  private static int setBackstagePassesQualityDelta(Item item) {
-    int qualityDelta;
-    qualityDelta = 1;
-    if (item.sellIn < 10) {
-      qualityDelta += 1;
-    }
-    if (item.sellIn < 5) {
-      qualityDelta += 1;
-    }
-    if (item.sellIn < 0) {
-      qualityDelta = -item.quality;
-    }
-    return qualityDelta;
   }
 }
