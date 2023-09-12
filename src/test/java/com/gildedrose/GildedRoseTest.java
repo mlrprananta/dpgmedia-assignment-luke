@@ -18,7 +18,7 @@ class GildedRoseTest {
   }
 
   @Test
-  void givenItem_WhenUpdateQuality_ThenItemDegrades() {
+  void givenItem_WhenUpdateQuality_ThenQualityDecreases() {
     Item[] items = new Item[] {new Item("foo", 2, 50)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
@@ -26,14 +26,13 @@ class GildedRoseTest {
   }
 
   @Test
-  void givenItemWithZeroQuality_WhenUpdateQuality_ThenQualityIsZero() {
+  void givenItemWithZeroQuality_WhenUpdateQuality_ThenQualityDoesNotChange() {
     Item[] items = new Item[] {new Item("foo", 0, 0)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
     assertEquals(0, app.items[0].quality);
   }
 
-  // Part of requirements (?), should this be enforced?
   @Test
   void givenItemWithNegativeQuality_WhenUpdateQuality_ThenQualityIsZero() {
     Item[] items = new Item[] {new Item("foo", 0, -1)};
@@ -42,17 +41,16 @@ class GildedRoseTest {
     assertEquals(0, app.items[0].quality);
   }
 
-  // Part of requirements (?), should this be enforced?
   @Test
-  void givenItemWith100Quality_WhenUpdateQuality_ThenQualityIs50() {
-    Item[] items = new Item[] {new Item("foo", 0, 100)};
+  void givenItemWith100Quality_WhenUpdateQuality_ThenQualityDecreasesFrom50() {
+    Item[] items = new Item[] {new Item("foo", 1, 100)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
-    assertEquals(50, app.items[0].quality);
+    assertEquals(49, app.items[0].quality);
   }
 
   @Test
-  void givenItemWithPassedSellByDate_WhenUpdateQuality_ThenItemDegradesTwice() {
+  void givenItemWithPassedSellByDate_WhenUpdateQuality_ThenQualityDecreasesTwice() {
     Item[] items = new Item[] {new Item("foo", 0, 50)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
@@ -60,16 +58,39 @@ class GildedRoseTest {
   }
 
   @Test
-  void givenAgedBrie_WhenUpdateQuality_ThenItemQualityIncreases() {
+  void givenAgedBrie_WhenUpdateQuality_ThenQualityIncreases() {
     Item[] items = new Item[] {new Item("Aged Brie", 1, 40)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
     assertEquals(41, app.items[0].quality);
   }
 
-  // Unsure if this is part of the requirements
   @Test
-  void givenAgedBrieWithPassedSellByDate_WhenUpdateQuality_ThenItemQualityIncreasesTwice() {
+  void givenAgedBrieWithNegativeQuality_WhenUpdateQuality_ThenQualityIncreasesFromZero() {
+    Item[] items = new Item[] {new Item("Aged Brie", 1, -10)};
+    GildedRose app = new GildedRose(items);
+    app.updateQuality();
+    assertEquals(1, app.items[0].quality);
+  }
+
+  @Test
+  void givenAgedBrieWithMaxQuality_WhenUpdateQuality_ThenQualityDoesNotChange() {
+    Item[] items = new Item[] {new Item("Aged Brie", 1, 50)};
+    GildedRose app = new GildedRose(items);
+    app.updateQuality();
+    assertEquals(50, app.items[0].quality);
+  }
+
+  @Test
+  void givenAgedBrieWith100Quality_WhenUpdateQuality_ThenQualityIs50() {
+    Item[] items = new Item[] {new Item("Aged Brie", 1, 100)};
+    GildedRose app = new GildedRose(items);
+    app.updateQuality();
+    assertEquals(50, app.items[0].quality);
+  }
+
+  @Test
+  void givenAgedBrieWithPassedSellByDate_WhenUpdateQuality_ThenQualityIncreasesTwice() {
     Item[] items = new Item[] {new Item("Aged Brie", 0, 40)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
@@ -77,7 +98,7 @@ class GildedRoseTest {
   }
 
   @Test
-  void givenSulfares_WhenUpdateQuality_ThenItemQualityDoesNotChange() {
+  void givenSulfares_WhenUpdateQuality_ThenQualityDoesNotChange() {
     Item[] items = new Item[] {new Item("Sulfuras, Hand of Ragnaros", 1, 80)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
@@ -85,7 +106,7 @@ class GildedRoseTest {
   }
 
   @Test
-  void givenSulfaresWithPassedSellByDate_WhenUpdateQuality_ThenItemQualityDoesNotChange() {
+  void givenSulfaresWithPassedSellByDate_WhenUpdateQuality_ThenQualityDoesNotChange() {
     Item[] items = new Item[] {new Item("Sulfuras, Hand of Ragnaros", 0, 80)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
@@ -113,41 +134,11 @@ class GildedRoseTest {
 
   @ParameterizedTest
   @MethodSource("backstagePassesTestCases")
-  void givenBackstagePasses_WhenUpdateQuality_ThenItemQualityChanges(
-      int sellIn, int expectedQuality) {
+  void givenBackstagePasses_WhenUpdateQuality_ThenQualityChanges(int sellIn, int expectedQuality) {
     Item[] items = new Item[] {new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, 10)};
     GildedRose app = new GildedRose(items);
     app.updateQuality();
     assertEquals(sellIn - 1, app.items[0].sellIn);
-    assertEquals(expectedQuality, app.items[0].quality);
-  }
-
-  private static Stream<Arguments> itemTestCases() {
-    /* name, sellIn, quality, expectedQuality */
-    return Stream.of(
-        Arguments.of("foo", 0, 0, 0),
-        Arguments.of("foo", 0, 10, 8),
-        Arguments.of("foo", -1, 10, 8),
-        Arguments.of("foo", 1, 10, 9),
-        Arguments.of("Aged Brie", 0, 10, 12),
-        Arguments.of("Aged Brie", 1, 10, 11),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 0, 10, 0),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 1, 10, 13),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 5, 10, 13),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 6, 10, 12),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 10, 10, 12),
-        Arguments.of("Backstage passes to a TAFKAL80ETC concert", 11, 10, 11),
-        Arguments.of("Sulfuras, Hand of Ragnaros", 0, 80, 80),
-        Arguments.of("Sulfuras, Hand of Ragnaros", 1, 80, 80));
-  }
-
-  @ParameterizedTest
-  @MethodSource("itemTestCases")
-  void givenItem_WhenUpdateQuality_ThenItemQualityDegrades(
-      String name, int sellIn, int quality, int expectedQuality) {
-    Item[] items = new Item[] {new Item(name, sellIn, quality)};
-    GildedRose app = new GildedRose(items);
-    app.updateQuality();
     assertEquals(expectedQuality, app.items[0].quality);
   }
 
@@ -156,8 +147,12 @@ class GildedRoseTest {
     return Stream.of(
         Arguments.of("Conjured foo", 0, 10, 6),
         Arguments.of("Conjured foo", 1, 10, 8),
+        Arguments.of("Conjured foo", 1, -10, 0),
+        Arguments.of("Conjured foo", 1, 100, 48),
         Arguments.of("Conjured Aged Brie", 0, 10, 14),
         Arguments.of("Conjured Aged Brie", 1, 10, 12),
+        Arguments.of("Conjured Aged Brie", 1, -10, 2),
+        Arguments.of("Conjured Aged Brie", 1, 100, 50),
         Arguments.of("Conjured Backstage passes to a TAFKAL80ETC concert", 0, 10, 0),
         Arguments.of("Conjured Backstage passes to a TAFKAL80ETC concert", 1, 10, 16),
         Arguments.of("Conjured Backstage passes to a TAFKAL80ETC concert", 5, 10, 16),
@@ -170,7 +165,7 @@ class GildedRoseTest {
 
   @ParameterizedTest
   @MethodSource("conjuredItemTestCases")
-  void givenConjuredItem_WhenUpdateQuality_ThenItemQualityDegradesTwiceAsFast(
+  void givenConjuredItem_WhenUpdateQuality_ThenQualityDegradesTwiceAsFast(
       String name, int sellIn, int quality, int expectedQuality) {
     Item[] items = new Item[] {new Item(name, sellIn, quality)};
     GildedRose app = new GildedRose(items);
